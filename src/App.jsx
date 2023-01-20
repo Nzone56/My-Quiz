@@ -1,34 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+import { useEffect, useRef, useState } from 'react';
 import './App.css'
+import { getFruits } from './getFruits'
 
-function App() {
-  const [count, setCount] = useState(0)
+export const App = () => {
 
+  const[ products, setProducts ] = useState([]); 
+  const [fruits, setFruits] = useState(products)
+  const inputFruit = useRef(0); 
+
+  const getProducts = async ()  => {
+    const  fruits  = await getFruits(); 
+    setProducts( fruits ); 
+  }
+  
+  useEffect(() => {
+    getProducts(); 
+  }, [])
+
+  const onSubmitChange = ( event ) => {
+      setFruits(getFruitsByName(event.target.value));
+  }
+  const getFruitsByName = ( name='' ) => {
+
+    name = name.toLowerCase().trim(); 
+    if(name.length === 0) return []; 
+
+    return products.filter( product =>
+        { product = product.toLowerCase(); 
+          return product.includes(name)}
+    )
+    
+  } 
   return (
-    <div className="App">
+    <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <input ref={inputFruit} type="text"  onChange={onSubmitChange} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div>
+        <ul>
+          {
+            fruits.map((product) => {
+              return <li key={ product }> { product } </li>
+            })
+      
+          }
+        </ul>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+    </>
+  );
 }
 
-export default App
